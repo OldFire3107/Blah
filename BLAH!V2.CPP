@@ -4,14 +4,8 @@
 ³ and the final product may not be the  ³
 ³ same.                                 ³
 ³                                       ³
-³ Blah! v2.0 Alpha Build                ³
-³                                       ³
-³ Duplication of this is strictly       ³
-³ prohibited without the permission     ³
-³ of its creator Agni Purani.           ³
-³                                       ³
-³ All Rights Resevered!                 ³
-³ Copyright 2018                        ³
+³ Blah! v2.0 Beta Build                 ³
+³ Creator - Agni Purani                 ³
 ³                                       ³
 ****************************************/
 
@@ -49,15 +43,15 @@ struct PowerUps
 
 enum Type{CLASSIC = 0, UNLIMITED, BACK};
 
-class HS   //FOR high score mangement
+class HS   //FOR high score system
 {
 public:
 	HS() {}
 	~HS() {}
 
-	int CalRankPos();
-
 	void StoreScore(long, char[]);
+	long GetScore() const { return Score; }
+	char* GetName() { return Name; }
 
 protected:
 	long Score;
@@ -70,20 +64,19 @@ public:
 	int GetSpawnRate() const { return SpawnRate; }
 	int GetColor1() const { return Color1; }
 	int GetColor2() const { return Color2; }
-	int GetScore() const { return Score; }
 
 	void Draw();
 	void PutName();
 	void Movement();
 	void Update();
 	void Reset();
-	void SaveScore();
+	void SaveScore(Type);
 	void ShareData(HS &h);
 
-	Game() 
-	{ 
+	Game()
+	{
 		Color1 = 6;
-		Color2 = 3; 
+		Color2 = 3;
 		SpawnRate = 5;
 	}
 
@@ -124,9 +117,9 @@ void SubGame();
 void Draw();
 void Input();
 void Process();
-void GameOverScreen(int);
+void GameOverScreen(int, Type);
 
-//Menu fuctions
+//Menu functions
 void MasterMenu();
 int Menu();
 Type SubMenu();
@@ -154,7 +147,7 @@ void main()
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//                      All Function Definetion                //
+//                      All Function Definition                //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 void Greet()
@@ -205,10 +198,10 @@ void Game(Type GameType)
 	default:
 		textcolor(RED);
 		gotoxy(22, 12);
-		cprintf("ERROR 2: Game could not be intiated.");
+		cprintf("ERROR 2: Game could not be initiated.");
 	}
 
-	GameOverScreen(Game);
+	GameOverScreen(Game, GameType);
 }
 
 //Game functions---------------------------------------------------------
@@ -251,7 +244,7 @@ void Draw()
 
 	textcolor(BlahGameManger.GetColor2());
 	gotoxy(18, 25);
-	cprintf("Your Score:%u", BlahGameManger.GetScore());
+	cprintf("Your Score:%ld", BlahGameManger.GetScore());
 }
 
 void Input()
@@ -298,7 +291,7 @@ void Process()
 	BlahGameManger.Update();
 }
 
-void GameOverScreen(int Reason)
+void GameOverScreen(int Reason, Type GameType)
 {
 	clrscr();
 
@@ -324,7 +317,7 @@ void GameOverScreen(int Reason)
 
 	textcolor(BlahGameManger.GetColor2());
 	gotoxy(40 - (3 + log10(BlahGameManger.GetScore() + 10)), 12);
-	cprintf("SCORE: %u", BlahGameManger.GetScore());
+	cprintf("SCORE: %ld", BlahGameManger.GetScore());
 
 	gotoxy(21, 14);
 	cprintf("Would you like to save your score: (y/n)");
@@ -340,7 +333,7 @@ void GameOverScreen(int Reason)
 		}
 		else if(Choice == 'y' || Choice == 'Y')
 		{
-			BlahGameManger.SaveScore();
+			BlahGameManger.SaveScore(GameType);
 			break;
 		}
 	}
@@ -600,7 +593,72 @@ void HelpMenu()
 
 void HighScoreMenu(Type GameType)
 {
+	clrscr();
+	HS Me, Top;
+	unsigned int i = 0, j = 0;
+	ifstream fin;
 
+	textcolor(BlahGameManger.GetColor2());
+	gotoxy(33, 3);
+	cprintf("Top 10 Players");
+	textcolor(BlahGameManger.GetColor1());
+
+	switch(GameType)
+	{
+	case CLASSIC:
+		fin.open("HSC.dat", ios::binary);
+		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
+		{
+			gotoxy(25, i + 5);
+			cprintf("%u) %s scores %ld", i + 1, Top.GetName(), Top.GetScore());
+		}
+
+		fin.seekg(0, ios::beg);
+		while (fin.read((char *) &Me, sizeof(Me)))
+		{
+			j++;
+			if (strcmp(Top.GetName(), BlahGameManger.GetName()) == 0)
+			{
+				gotoxy(22 - (2 + log10(Top.GetScore()) + log10(j)), 19);
+				cprintf("Your Highest Score is %ld and rank is %lu", Top.GetScore(), j);
+			}
+		}
+		break;
+
+	case UNLIMITED:
+		fin.open("HSU.dat", ios::binary);
+		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
+		{
+			gotoxy(25, i + 5);
+			cprintf("%u) %s scores %ld", i + 1, Top.GetName(), Top.GetScore());
+		}
+
+		fin.seekg(0, ios::beg);
+		while (fin.read((char *) &Me, sizeof(Me)))
+		{
+			j++;
+			if (strcmp(Me.GetName(), BlahGameManger.GetName()) == 0)
+			{
+				gotoxy(22 - (2 + log10(Top.GetScore()) + log10(j)), 19);
+				cprintf("Your Highest Score is %ld and rank is %lu", Top.GetScore(), j);
+			}
+		}
+		break;
+
+	default:
+		clrscr();
+		textcolor(RED);
+		gotoxy(22, 12);
+		cprintf("ERROR 5: Failed to open a file type.");
+		i = 1;
+	}
+
+	textcolor(RED);
+	gotoxy(23, 22);
+	cprintf("Press the enter key to continue...");
+
+	while(getch() != 13);
+	fin.close();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -612,17 +670,81 @@ void HS::StoreScore(long s, char n[])
 	strcpy(Name, n);
 }
 
-void Game::ShareData(HS &h)
+void Game::SaveScore(Type GameType)
 {
-	h.StoreScore(Score, Name);
-}
+	HS Writer, Reader;
+	char FileName[15];
+	Writer.StoreScore(Score, Name);
 
-void Game::SaveScore()
-{
-	HS Writter, Arranger;
-	ShareData(Writter);
+	switch(GameType)
+	{
+	case CLASSIC:
+		strcpy(FileName, "HSC.dat");
+		break;
 
+	case UNLIMITED:
+		strcpy(FileName, "HSU.dat");
+		break;
 
+	default:
+		clrscr();
+		textcolor(RED);
+		gotoxy(31, 12);
+		cprintf("ERROR 4: Failed to recognise file to save.");
+	}
+
+	ifstream fin(FileName, ios::binary);
+	ofstream fout("Temp.dat", ios::binary);
+
+	while(fin.read((char*) &Reader, sizeof(Reader)))
+	{
+		if (strcmp(Reader.GetName(), BlahGameManger.Name) == 0)
+		{
+			continue;
+		}
+		else
+		{
+			fout.write((char*) &Reader, sizeof(Reader));
+		}
+	}
+
+	fout.close();
+	fin.close();
+	remove(FileName);
+	rename("Temp.dat", FileName);
+
+	fin.open(FileName, ios::binary);
+	fout.open("Temp.dat", ios::binary);
+
+	char last = 'y';
+	while(fin.read((char*) &Reader, sizeof(Reader)))
+	{
+		if(Reader.GetScore() > Writer.GetScore())
+		{
+			fout.write((char*) &Reader, sizeof(Reader));
+		}
+		else if(Reader.GetScore() < Writer.GetScore() && last == 'y')
+		{
+			fout.write((char*) &Writer, sizeof(Writer));
+			fout.write((char*) &Reader, sizeof(Reader));
+			last = 'n';
+		}
+		else
+		{
+			fout.write((char*) &Reader, sizeof(Reader));
+		}
+	}
+
+	if(last == 'y')
+	{
+		fout.write((char*) &Writer, sizeof(Writer));
+	}
+
+	fout.close();
+	fin.close();
+
+	remove(FileName);
+	rename("Temp.dat", FileName);
 }
 
 void Game::PutName()
@@ -648,7 +770,7 @@ void Game::PutName()
 		cprintf("³");
 		gotoxy(30, 14);
 		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
-		 
+
 		gotoxy(40 - (count + 1) / 2, 13);
 		textcolor(WHITE);
 		cprintf("%s", Namebuff);
@@ -677,7 +799,7 @@ void Game::PutName()
 			{
 				count++;
 			}
-			else 
+			else
 			{
 				Namebuff[count++] = t;
 				Namebuff[count] = '\0';
@@ -693,7 +815,7 @@ void Game::PutName()
 			f = 1;
 			getch();
 		}
-		
+
 	}while(t != 13 || count == 0);
 
 	strcpy(Name, Namebuff);
@@ -745,7 +867,6 @@ void Game::Update()
 {
 	TempScore = Score;
 
-
 	if(PlayerPos.x == Apple.x && PlayerPos.y == Apple.y)
 	{
 		Score++;
@@ -778,6 +899,7 @@ void Game::Reset()
 	GameOver = 0;
 	Move = STOP;
 	Score = 0;
+	TempScore = 0;
 }
 
 void Game::Draw()
@@ -825,7 +947,14 @@ void Game::ZombieAI()
 ³ Contact: agni.purani@gmail.com     ³
 ³                                    ³
 ³ Files used in this program:        ³
-³	ì HighScoreT.txt                ³
-³	ì UserSettings.txt              ³
+³	ì HSC.dat                        ³
+³	ì HSU.dat                        ³
+³	ì US.txt                         ³
 ³                                    ³
 *************************************/
+
+//TODO FIX the buggy high score system
+//TODO ADD Power Ups
+//TODO ADD a method to load the Users previous setting if exists
+//TODO FIX the bug where when you hold down a key the player lags input
+//TODO REFINE the Game & update the TODO list
