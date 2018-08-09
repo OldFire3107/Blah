@@ -43,7 +43,24 @@ struct PowerUps
 
 enum Type{CLASSIC = 0, UNLIMITED, BACK};
 
-class HS   //FOR high score system
+class Settings
+{
+public:
+	Settings() {}
+	~Settings() {}
+
+	void StoreSettings(int, int, int, char[]);
+	void ShareSettings(int&, int&, int&);
+	char* GetName() { return Name; }
+
+protected:
+	char Name[17];
+	int Color1;
+	int Color2;
+	int SpawnRate;
+};
+
+class HS:public Settings    //FOR high score system
 {
 public:
 	HS() {}
@@ -51,11 +68,9 @@ public:
 
 	void StoreScore(long, char[]);
 	long GetScore() const { return Score; }
-	char* GetName() { return Name; }
 
 protected:
 	long Score;
-	char Name[17];
 };
 
 class Game:public HS  //This class defines how the game will be(Easy...) ie Game Instance
@@ -72,6 +87,9 @@ public:
 	void Reset();
 	void SaveScore(Type);
 	void ShareData(HS &h);
+	void LoadSettings();
+	void SaveSettings();
+	void SettingsChange(int);
 
 	Game()
 	{
@@ -83,9 +101,6 @@ public:
 	~Game() {}
 
 private:
-	int SpawnRate;
-	int Color1;
-	int Color2;
 	long TempScore;
 	long ZombieCount;
 	int pos;
@@ -123,9 +138,10 @@ void GameOverScreen(int, Type);
 void MasterMenu();
 int Menu();
 Type SubMenu();
-void SettingMenu();
+int SettingMenu();
 void HelpMenu();
 void HighScoreMenu(Type);
+int Difficulty();
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                            MAIN                                     //
@@ -155,6 +171,8 @@ void Greet()
 	_setcursortype(_NOCURSOR);
 
 	BlahGameManger.PutName();
+
+	BlahGameManger.LoadSettings();
 }
 
 void Game(Type GameType)
@@ -440,8 +458,6 @@ int Menu()
 
 Type SubMenu()
 {
-	Reselect:
-
 	int Selection = 5;
 	char c;
 
@@ -503,12 +519,12 @@ Type SubMenu()
 	else if(Selection == 17)
 		return BACK;
 	else
-		goto Reselect;
+		return BACK;
 }
 
-void SettingMenu()
+int SettingMenu()
 {
-	int Selection = 4;
+	int Selection = 5;
 	char c;
 
 	for( ; ; )
@@ -516,29 +532,31 @@ void SettingMenu()
 		clrscr();
 		textcolor(BlahGameManger.GetColor2());
 
-		gotoxy(38, 5);
-		cprintf("DESIGN");
-		gotoxy(38, 9);
-		cprintf("DIFFCLULTY");
+		gotoxy(38, 6);
+		cprintf("COLORS");
+		gotoxy(34, 12);
+		cprintf("DIFFICULTY");
+		gotoxy(39, 18);
+		cprintf("BACK");
 
-		textcolor(6 + BLINK);
+		textcolor(BlahGameManger.GetColor1() + BLINK);
 		gotoxy(33, Selection);
-		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿");
 		gotoxy(33, Selection + 1);
 		cprintf("³");
-		gotoxy(46, Selection + 1);
+		gotoxy(48, Selection + 1);
 		cprintf("³");
 		gotoxy(33, Selection + 2);
-		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
 
 		if(kbhit())
 		{
 			c = getch();
 
 			if(c == 72)
-				Selection -= 4;
+				Selection -= 6;
 			if(c == 80)
-				Selection += 4;
+				Selection += 6;
 
 			if(c == 13)
 			{
@@ -553,12 +571,21 @@ void SettingMenu()
 			}
 
 			if(Selection > 20)
-				Selection = 4;
+				Selection = 5;
 			if(Selection < 4)
-				Selection = 20;
+				Selection = 17;
 		}
-	delay(15);
+		delay(15);
 	}
+
+	if(Selection == 5)
+		return 1;
+	else if(Selection == 11)
+		return 2;
+	else if(Selection == 17)
+		return 0;
+	else
+		return 0;
 }
 
 void HelpMenu()
@@ -594,7 +621,7 @@ void HelpMenu()
 void HighScoreMenu(Type GameType)
 {
 	clrscr();
-	HS Me, Top;
+	HS Top;
 	unsigned int i = 0, j = 0;
 	ifstream fin;
 
@@ -610,17 +637,20 @@ void HighScoreMenu(Type GameType)
 		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
 		{
 			gotoxy(25, i + 5);
-			cprintf("%u) %s scores %ld", i + 1, Top.GetName(), Top.GetScore());
+			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
 		}
 
-		fin.seekg(0, ios::beg);
-		while (fin.read((char *) &Me, sizeof(Me)))
+		fin.close();
+		fin.open("HSC.dat", ios::binary);
+
+		//fin.seekg(0, ios::beg);
+		while (fin.read((char *) &Top, sizeof(Top)))
 		{
 			j++;
 			if (strcmp(Top.GetName(), BlahGameManger.GetName()) == 0)
 			{
 				gotoxy(22 - (2 + log10(Top.GetScore()) + log10(j)), 19);
-				cprintf("Your Highest Score is %ld and rank is %lu", Top.GetScore(), j);
+				cprintf("Your Highest Score is %ld and rank is %u", Top.GetScore(), j);
 			}
 		}
 		break;
@@ -630,17 +660,20 @@ void HighScoreMenu(Type GameType)
 		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
 		{
 			gotoxy(25, i + 5);
-			cprintf("%u) %s scores %ld", i + 1, Top.GetName(), Top.GetScore());
+			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
 		}
 
-		fin.seekg(0, ios::beg);
-		while (fin.read((char *) &Me, sizeof(Me)))
+		fin.close();
+		fin.open("HSU.dat", ios::binary);
+
+		//fin.seekg(0, ios::beg);
+		while (fin.read((char *) &Top, sizeof(Top)))
 		{
 			j++;
-			if (strcmp(Me.GetName(), BlahGameManger.GetName()) == 0)
+			if (strcmp(Top.GetName(), BlahGameManger.GetName()) == 0)
 			{
 				gotoxy(22 - (2 + log10(Top.GetScore()) + log10(j)), 19);
-				cprintf("Your Highest Score is %ld and rank is %lu", Top.GetScore(), j);
+				cprintf("Your Highest Score is %ld and rank is %u", Top.GetScore(), j);
 			}
 		}
 		break;
@@ -661,19 +694,168 @@ void HighScoreMenu(Type GameType)
 	fin.close();
 }
 
+int Difficulty()
+{
+	int Selection = 5;
+	char c;
+
+	for( ; ; )
+	{
+		clrscr();
+		textcolor(BlahGameManger.GetColor2());
+
+		gotoxy(38, 6);
+		cprintf("Easy");
+		gotoxy(34, 12);
+		cprintf("Medium");
+		gotoxy(39, 18);
+		cprintf("Extreme");
+
+		textcolor(BlahGameManger.GetColor1() + BLINK);
+		gotoxy(33, Selection);
+		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		gotoxy(33, Selection + 1);
+		cprintf("³");
+		gotoxy(48, Selection + 1);
+		cprintf("³");
+		gotoxy(33, Selection + 2);
+		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+
+		if(kbhit())
+		{
+			c = getch();
+
+			if(c == 72)
+				Selection -= 6;
+			if(c == 80)
+				Selection += 6;
+
+			if(c == 13)
+			{
+				sound(500);
+				delay(50);
+				sound(700);
+				delay(300);
+				sound(450);
+				delay(50);
+				nosound();
+				break;
+			}
+
+			if(Selection > 20)
+				Selection = 5;
+			if(Selection < 4)
+				Selection = 17;
+		}
+		delay(15);
+	}
+
+	if(Selection == 5)
+		return 10;
+	else if(Selection == 11)
+		return 8;
+	else if(Selection == 17)
+		return 5;
+	else
+		return 5;
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                        Class Member functions                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+void Settings::ShareSettings(int &c1, int &c2, int &sr)
+{
+	c1 = Color1;
+	c2 = Color2;
+	sr =SpawnRate;
+}
+
+void Settings::StoreSettings(int c1, int c2, int sr, char n[])
+{
+	Color1 = c1;
+	Color2 = c2;
+	SpawnRate = sr;
+	strcpy(Name, n);
+}
+
 void HS::StoreScore(long s, char n[])
 {
 	Score = s;
 	strcpy(Name, n);
 }
 
+void Game::SettingsChange(int s)
+{
+	clrscr();
+	int f1 = 0, f2 = 0;
+	Settings Saver;
+
+	//textcolor();
+
+	switch(s)
+	{
+		case 1:
+			f1++;
+			break;
+
+		case 2:
+			SpawnRate = Difficulty();
+			f1++;
+			break;
+
+		case 0:
+			return;
+
+		default:
+			textcolor(RED);
+			gotoxy(22, 12);
+			cprintf("ERROR 2: Game could not be initiated.");
+	}
+
+	if(f1 != 0)
+	{
+		fstream fio("US.dat", ios::binary | ios::in | ios:: out);
+
+		while(!fio.eof())
+		{
+			fio.read((char*) &Saver, sizeof(Saver));
+			if(strcmp(Name, Saver.GetName()) == 0)
+			{
+				Saver.StoreSettings(Color1, Color2, SpawnRate, Name);
+				fio.seekg(-1* sizeof(Saver), ios::cur);
+				fio.write((char*) &Saver, sizeof(Saver));
+				f2++;
+			}
+		}
+
+		if(f2 == 0)
+		{
+			Saver.StoreSettings(Color1, Color2, SpawnRate, Name);
+			fio.write((char*) &Saver, sizeof(Saver));
+		}
+	}
+}
+
+void Game::LoadSettings()
+{
+	Settings Loader;
+
+	ifstream fin("US.dat", ios::binary);
+
+	while(fin.read((char*) &Loader, sizeof(Loader)))
+	{
+		if(strcmp(Name, Loader.GetName()) == 0)
+		{
+			Loader.ShareSettings(Color1, Color2, SpawnRate);
+			break;
+		}
+	}
+}
+
 void Game::SaveScore(Type GameType)
 {
 	HS Writer, Reader;
-	char FileName[15];
+	char FileName[8];
 	Writer.StoreScore(Score, Name);
 
 	switch(GameType)
@@ -691,6 +873,8 @@ void Game::SaveScore(Type GameType)
 		textcolor(RED);
 		gotoxy(31, 12);
 		cprintf("ERROR 4: Failed to recognise file to save.");
+		sleep(2);
+		return;
 	}
 
 	ifstream fin(FileName, ios::binary);
@@ -728,6 +912,7 @@ void Game::SaveScore(Type GameType)
 			fout.write((char*) &Writer, sizeof(Writer));
 			fout.write((char*) &Reader, sizeof(Reader));
 			last = 'n';
+			break;
 		}
 		else
 		{
@@ -947,14 +1132,15 @@ void Game::ZombieAI()
 ³ Contact: agni.purani@gmail.com     ³
 ³                                    ³
 ³ Files used in this program:        ³
-³	ì HSC.dat                        ³
-³	ì HSU.dat                        ³
-³	ì US.txt                         ³
+³	ì HSC.dat                    ³
+³	ì HSU.dat                    ³
+³	ì US.txt		     ³
 ³                                    ³
 *************************************/
 
-//TODO FIX the buggy high score system
 //TODO ADD Power Ups
+//TODO COMPLETE settings
 //TODO ADD a method to load the Users previous setting if exists
 //TODO FIX the bug where when you hold down a key the player lags input
 //TODO REFINE the Game & update the TODO list
+//TODO FIND reason for fin.seekg() and virtual not working.
