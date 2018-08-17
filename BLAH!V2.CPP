@@ -21,6 +21,12 @@
 #include <stdlib.h>
 #include <math.h>
 
+///////All Other Preprocessor directives////////
+
+#define Easy 10
+#define Medium 8
+#define Extreme 5
+
 ///////All Global Variables/////////
 
 int GameOver = 0;
@@ -95,7 +101,7 @@ public:
 	{
 		Color1 = 6;
 		Color2 = 3;
-		SpawnRate = 5;
+		SpawnRate = Medium;
 	}
 
 	~Game() {}
@@ -109,6 +115,7 @@ private:
 	Pos PlayerPos;
 
 	void ZombieAI();
+	void ColorChange();
 
 }BlahGameManger;
 
@@ -361,7 +368,6 @@ void GameOverScreen(int Reason, Type GameType)
 void MasterMenu()
 {
 	int GameExit = 0;
-
 	do
 	{
 		switch(Menu())
@@ -376,6 +382,10 @@ void MasterMenu()
 
 		case 3:
 			HighScoreMenu(SubMenu());
+			break;
+
+		case 4:
+			BlahGameManger.SettingsChange(SettingMenu());
 			break;
 
 		case 5:
@@ -401,7 +411,7 @@ int Menu()
 	for( ; ; )
 	{
 		clrscr();
-		textcolor(CYAN);
+		textcolor(BlahGameManger.GetColor2());
 
 		gotoxy(38, 5);
 		cprintf("PLAY");
@@ -414,7 +424,7 @@ int Menu()
 		gotoxy(38, 21);
 		cprintf("EXIT");
 
-		textcolor(6 + BLINK);
+		textcolor(BlahGameManger.GetColor1() + BLINK);
 		gotoxy(33, Selection);
 		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿");
 		gotoxy(33, Selection + 1);
@@ -534,7 +544,7 @@ int SettingMenu()
 
 		gotoxy(38, 6);
 		cprintf("COLORS");
-		gotoxy(34, 12);
+		gotoxy(36, 12);
 		cprintf("DIFFICULTY");
 		gotoxy(39, 18);
 		cprintf("BACK");
@@ -622,60 +632,73 @@ void HighScoreMenu(Type GameType)
 {
 	clrscr();
 	HS Top;
-	unsigned int i = 0, j = 0;
+	unsigned int i = 0;
 	ifstream fin;
 
 	textcolor(BlahGameManger.GetColor2());
 	gotoxy(33, 3);
-	cprintf("Top 10 Players");
+	cprintf("Top 10 Players:");
 	textcolor(BlahGameManger.GetColor1());
 
-	switch(GameType)
+	switch(GameType) //TODO FIX THIS
 	{
 	case CLASSIC:
-		fin.open("HSC.dat", ios::binary);
+		fin.open("HSCE.dat", ios::binary);
 		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
 		{
-			gotoxy(25, i + 5);
+			gotoxy(5, i + 7);
 			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
 		}
 
-		fin.close();
-		fin.open("HSC.dat", ios::binary);
+		fin.close(); i = 0;
 
-		//fin.seekg(0, ios::beg);
-		while (fin.read((char *) &Top, sizeof(Top)))
+		fin.open("HSCM.dat", ios::binary);
+		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
 		{
-			j++;
-			if (strcmp(Top.GetName(), BlahGameManger.GetName()) == 0)
-			{
-				gotoxy(22 - (2 + log10(Top.GetScore()) + log10(j)), 19);
-				cprintf("Your Highest Score is %ld and rank is %u", Top.GetScore(), j);
-			}
+			gotoxy(30, i + 7);
+			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
 		}
-		break;
+
+		fin.close(); i = 0;
+
+		fin.open("HSCD.dat", ios::binary);
+		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
+		{
+			gotoxy(60, i + 7);
+			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
+		}
+
+		fin.close(); i = 0;
 
 	case UNLIMITED:
-		fin.open("HSU.dat", ios::binary);
+		fin.open("HSUE.dat", ios::binary);
 		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
 		{
-			gotoxy(25, i + 5);
+			gotoxy(5, i + 7);
 			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
 		}
 
-		fin.close();
-		fin.open("HSU.dat", ios::binary);
+		fin.close(); i = 0;
 
-		//fin.seekg(0, ios::beg);
-		while (fin.read((char *) &Top, sizeof(Top)))
+		fin.open("HSUM.dat", ios::binary);
+		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
 		{
-			j++;
-			if (strcmp(Top.GetName(), BlahGameManger.GetName()) == 0)
-			{
-				gotoxy(22 - (2 + log10(Top.GetScore()) + log10(j)), 19);
-				cprintf("Your Highest Score is %ld and rank is %u", Top.GetScore(), j);
-			}
+			gotoxy(30, i + 7);
+			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
 		}
+
+		fin.close(); i = 0;
+
+		fin.open("HSUD.dat", ios::binary);
+		while (fin.read((char *) &Top, sizeof(Top)) && i < 10)
+		{
+			gotoxy(60, i + 7);
+			cprintf("%u) %s scores %ld", ++i, Top.GetName(), Top.GetScore());
+		}
+
+		fin.close(); i = 0;
+
+	case BACK:
 		break;
 
 	default:
@@ -704,11 +727,11 @@ int Difficulty()
 		clrscr();
 		textcolor(BlahGameManger.GetColor2());
 
-		gotoxy(38, 6);
+		gotoxy(39, 6);
 		cprintf("Easy");
-		gotoxy(34, 12);
+		gotoxy(38, 12);
 		cprintf("Medium");
-		gotoxy(39, 18);
+		gotoxy(37, 18);
 		cprintf("Extreme");
 
 		textcolor(BlahGameManger.GetColor1() + BLINK);
@@ -751,23 +774,98 @@ int Difficulty()
 	}
 
 	if(Selection == 5)
-		return 10;
+		return Easy;
 	else if(Selection == 11)
-		return 8;
+		return Medium;
 	else if(Selection == 17)
-		return 5;
+		return Extreme;
 	else
-		return 5;
+		return Medium;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                        Class Member functions                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+void Game::ColorChange() //TODO change this
+{
+	int Selection = 5;
+	char c;
+
+	for( ; ; )
+	{
+		clrscr();
+		textcolor(BlahGameManger.GetColor2());
+
+		gotoxy(34, 6);
+		cprintf("Brown and Cyan");
+		gotoxy(35, 12);
+		cprintf("Red and Blue");
+		gotoxy(33, 18);
+		cprintf("Yellow and Green");
+
+		textcolor(BlahGameManger.GetColor1() + BLINK);
+		gotoxy(31, Selection);
+		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		gotoxy(31, Selection + 1);
+		cprintf("³");
+		gotoxy(49, Selection + 1);
+		cprintf("³");
+		gotoxy(31, Selection + 2);
+		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+
+		if(kbhit())
+		{
+			c = getch();
+
+			if(c == 72)
+				Selection -= 6;
+			if(c == 80)
+				Selection += 6;
+
+			if(c == 13)
+			{
+				sound(500);
+				delay(50);
+				sound(700);
+				delay(300);
+				sound(450);
+				delay(50);
+				nosound();
+				break;
+			}
+
+			if(Selection > 20)
+				Selection = 5;
+			if(Selection < 4)
+				Selection = 17;
+		}
+		delay(15);
+	}
+
+	if(Selection == 5)
+	{
+		Color1 = 6;
+		Color2 = 3;
+	}
+	else if(Selection == 11)
+	{
+		Color1 = 4;
+		Color2 = 1;
+	}
+	else if(Selection == 17)
+	{
+		Color1 = 14;
+		Color2 = 2;
+	}
+	else
+	{; }
+}
+
 void Settings::ShareSettings(int &c1, int &c2, int &sr)
 {
 	c1 = Color1;
 	c2 = Color2;
-	sr =SpawnRate;
+	sr = SpawnRate;
 }
 
 void Settings::StoreSettings(int c1, int c2, int sr, char n[])
@@ -784,17 +882,16 @@ void HS::StoreScore(long s, char n[])
 	strcpy(Name, n);
 }
 
-void Game::SettingsChange(int s)
+void Game::SettingsChange(int s) //TODO FIX no write
 {
 	clrscr();
 	int f1 = 0, f2 = 0;
 	Settings Saver;
 
-	//textcolor();
-
 	switch(s)
 	{
 		case 1:
+			ColorChange();
 			f1++;
 			break;
 
@@ -808,8 +905,8 @@ void Game::SettingsChange(int s)
 
 		default:
 			textcolor(RED);
-			gotoxy(22, 12);
-			cprintf("ERROR 2: Game could not be initiated.");
+			gotoxy(19, 12);
+			cprintf("ERROR 6: Settings could not be initiated.");
 	}
 
 	if(f1 != 0)
@@ -822,7 +919,7 @@ void Game::SettingsChange(int s)
 			if(strcmp(Name, Saver.GetName()) == 0)
 			{
 				Saver.StoreSettings(Color1, Color2, SpawnRate, Name);
-				fio.seekg(-1* sizeof(Saver), ios::cur);
+				fio.seekg(-1 * sizeof(Saver), ios::cur);
 				fio.write((char*) &Saver, sizeof(Saver));
 				f2++;
 			}
@@ -855,18 +952,44 @@ void Game::LoadSettings()
 void Game::SaveScore(Type GameType)
 {
 	HS Writer, Reader;
-	char FileName[8];
+	char FileName[9];
 	Writer.StoreScore(Score, Name);
 
 	switch(GameType)
 	{
 	case CLASSIC:
-		strcpy(FileName, "HSC.dat");
-		break;
+		if(SpawnRate == Easy)
+		{
+			strcpy(FileName, "HSCE.dat");
+			break;
+		}
+		else if(SpawnRate == Medium)
+		{
+			strcpy(FileName, "HSCM.dat");
+			break;
+		}
+		else if(SpawnRate == Extreme)
+		{
+			strcpy(FileName, "HSCD.dat");
+			break;
+		}
 
 	case UNLIMITED:
-		strcpy(FileName, "HSU.dat");
-		break;
+		if(SpawnRate == Easy)
+		{
+			strcpy(FileName, "HSUE.dat");
+			break;
+		}
+		else if(SpawnRate == Medium)
+		{
+			strcpy(FileName, "HSUM.dat");
+			break;
+		}
+		else if(SpawnRate == Extreme)
+		{
+			strcpy(FileName, "HSUD.dat");
+			break;
+		}
 
 	default:
 		clrscr();
@@ -1059,7 +1182,7 @@ void Game::Update()
 		Apple.y = random(21) + 2;
 	}
 
-	if(Score % 5 == 0)
+	if(Score % SpawnRate == 0)
 	{
 		if(TempScore + 1 == Score)
 		{
@@ -1139,8 +1262,8 @@ void Game::ZombieAI()
 *************************************/
 
 //TODO ADD Power Ups
-//TODO COMPLETE settings
+//TODO COMPLETE settings & separate high scores for each difficulty
 //TODO ADD a method to load the Users previous setting if exists
 //TODO FIX the bug where when you hold down a key the player lags input
 //TODO REFINE the Game & update the TODO list
-//TODO FIND reason for fin.seekg() and virtual not working.
+//TODO COMPLETE end of program comment
