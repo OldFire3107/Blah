@@ -1,12 +1,12 @@
 /***IMPORTANT NOTICE BY THE DEVELOPER****
-³                                       ³
-³ This game is still under alpha stages ³
-³ and the final product may not be the  ³
-³ same.                                 ³
-³                                       ³
-³ Blah! v2.0 Beta Build                 ³
-³ Creator - Agni Purani                 ³
-³                                       ³
+Â³                                       Â³
+Â³ This game is still under beta  stages Â³
+Â³ and the final product may not be the  Â³
+Â³ same.                                 Â³
+Â³                                       Â³
+Â³ Blah! v2.0 Beta Build                 Â³
+Â³ Creator - Agni Purani                 Â³
+Â³                                       Â³
 ****************************************/
 
 
@@ -247,22 +247,22 @@ void Draw()
 	for(int i = 1; i <= 24; i++)
 	{
 		gotoxy(1, i);
-		cprintf("Û");
+		cprintf("Ã›");
 	}
 	for(i = 1; i <= 24; i++)
 	{
 		gotoxy(80, i);
-		cprintf("Û");
+		cprintf("Ã›");
 	}
 	for(i = 1; i <= 80; i++)
 	{
 		gotoxy(i, 1);
-		cprintf("Û");
+		cprintf("Ã›");
 	}
 	for(i = 1; i <= 80; i++)
 	{
 		gotoxy(i, 24);
-		cprintf("Û");
+		cprintf("Ã›");
 	}
 
 	BlahGameManger.Draw();
@@ -426,13 +426,13 @@ int Menu()
 
 		textcolor(BlahGameManger.GetColor1() + BLINK);
 		gotoxy(33, Selection);
-		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		cprintf("ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿");
 		gotoxy(33, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(46, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(33, Selection + 2);
-		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+		cprintf("Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™");
 
 		if(kbhit())
 		{
@@ -485,13 +485,13 @@ Type SubMenu()
 
 		textcolor(BlahGameManger.GetColor1() + BLINK);
 		gotoxy(34, Selection);
-		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		cprintf("ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿");
 		gotoxy(34, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(47, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(34, Selection + 2);
-		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+		cprintf("Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™");
 
 		if(kbhit())
 		{
@@ -551,13 +551,13 @@ int SettingMenu()
 
 		textcolor(BlahGameManger.GetColor1() + BLINK);
 		gotoxy(33, Selection);
-		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		cprintf("ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿");
 		gotoxy(33, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(48, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(33, Selection + 2);
-		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+		cprintf("Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™");
 
 		if(kbhit())
 		{
@@ -736,13 +736,13 @@ int Difficulty()
 
 		textcolor(BlahGameManger.GetColor1() + BLINK);
 		gotoxy(33, Selection);
-		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		cprintf("ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿");
 		gotoxy(33, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(48, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(33, Selection + 2);
-		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+		cprintf("Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™");
 
 		if(kbhit())
 		{
@@ -805,13 +805,13 @@ void Game::ColorChange() //TODO change this
 
 		textcolor(BlahGameManger.GetColor1() + BLINK);
 		gotoxy(31, Selection);
-		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		cprintf("ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿");
 		gotoxy(31, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(49, Selection + 1);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(31, Selection + 2);
-		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+		cprintf("Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™");
 
 		if(kbhit())
 		{
@@ -1071,13 +1071,13 @@ void Game::PutName()
 
 		textcolor(CYAN);
 		gotoxy(30, 12);
-		cprintf("ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿");
+		cprintf("ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿");
 		gotoxy(30, 13);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(49, 13);
-		cprintf("³");
+		cprintf("Â³");
 		gotoxy(30, 14);
-		cprintf("ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
+		cprintf("Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™");
 
 		gotoxy(40 - (count + 1) / 2, 13);
 		textcolor(WHITE);
@@ -1249,16 +1249,16 @@ void Game::ZombieAI()
 }
 
 /*************************************
-³                                    ³
-³ The end of program.                ³
-³ Thanks for seeing.                 ³
-³ Contact: agni.purani@gmail.com     ³
-³                                    ³
-³ Files used in this program:        ³
-³	ì HSC.dat                    ³
-³	ì HSU.dat                    ³
-³	ì US.txt		     ³
-³                                    ³
+Â³                                    Â³
+Â³ The end of program.                Â³
+Â³ Thanks for seeing.                 Â³
+Â³ Contact: agni.purani@gmail.com     Â³
+Â³                                    Â³
+Â³ Files used in this program:        Â³
+Â³	Ã¬ HSC.dat                    Â³
+Â³	Ã¬ HSU.dat                    Â³
+Â³	Ã¬ US.txt		     Â³
+Â³                                    Â³
 *************************************/
 
 //TODO ADD Power Ups
